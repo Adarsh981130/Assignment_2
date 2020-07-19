@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/docs/4.0/assets/img/favicons/favicon.ico">
+    <title>Contact Us</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- style.css-->
+    <link href="css/style.css" rel="stylesheet">
+     <link href="css/aos.css" rel="stylesheet">
+     <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+  </head>
+  <body>
+    <div id="loader" class="center"></div> 
+    <nav class="navbar navbar-expand-md navbar-light fixed-top bg-light">
+     <a class="navbar-brand" href="#"><img src="images/logo.png"/></a>
+        <input type="checkbox" id="menu-button" class="menu-input navbar-toggle " data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" />
+        <label class="menu-button" for="menu-button">
+            <span></span>
+        </label>
+       <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav mr-auto smooth-scroll">
+            <li class="nav-item">
+              <a class="nav-link"  class="Quick-navigation-item" href="index.html"> Home </a>
+            </li>
+            <li class="nav-item ">
+              <a class="nav-link"  class="Quick-navigation-item" href="portfolio.html">Portfolio </a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link"  class="Quick-navigation-item" href="contact.html"> Contact Us <span class="sr-only">(current)</span></a>
+              </li>
+              <li class="nav-item">
+              <a class="nav-link"  class="Quick-navigation-item" href="CV.html"> CV</a>
+            </li>
+          </ul>
+        </div>
+    </nav>
+     
+
+    <!-- SCRIPTS -->
+    <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+    <!-- page scrolling used-->
+    <script src="js/ScrollMagic.min.js"></script>
+    <script src="js/debug.addIndicators.min.js"></script>
+    <script type="text/javascript" src="js/aos.js"></script>
+    
+    <script>
+//animation of cars
+   AOS.init();
+
+//scrooling top
+   (function () {
+    
+   //////////////////////
+  // Utils
+  //////////////////////
+    function throttle(fn, delay, scope) {
+        // Default delay
+        delay = delay || 250;
+        var last, defer;
+        return function () {
+            var context = scope || this,
+                now = +new Date(),
+                args = arguments;
+            if (last && now < last + delay) {
+                clearTimeout(defer);
+                defer = setTimeout(function () {
+                    last = now;
+                    fn.apply(context, args);
+                }, delay);
+            } else {
+                last = now;
+                fn.apply(context, args);
+            }
+        }
+    }
+
+    function extend(destination, source) {
+        for (var k in source) {
+            if (source.hasOwnProperty(k)) {
+                destination[k] = source[k];
+            }
+        }
+        return destination;
+    }
+  
+   //////////////////////
+  // END Utils
+  //////////////////////
+  
+   //////////////////////
+   // Scroll Module
+   //////////////////////
+
+    var ScrollManager = (function () {
+
+        var defaults = {
+
+                steps: null,
+                navigationContainer: null,
+                //links: null,
+                scrollToTopBtn: null,
+
+                navigationElementClass: '.Quick-navigation',
+                currentStepClass: 'current',
+                smoothScrollEnabled: true,
+                stepsCheckEnabled: true,
+
+                // Callbacks
+                onScroll: null,
+
+                // onStepChange: function (step) {
+                //     var self = this;
+                //     var relativeLink = [].filter.call(options.links, function (link) {
+                //         link.classList.remove(self.currentStepClass);
+                //         return link.hash === '#' + step.id;
+                //     });
+                //     relativeLink[0].classList.add(self.currentStepClass);
+                // },
+
+                // Provide a default scroll animation
+                smoothScrollAnimation: function (target) {
+                    $('html, body').animate({
+                        scrollTop: target
+                    }, 'slow');
+                }
+            },
+
+            options = {};
+
+        // Privates
+        var _animation = null,
+            currentStep = null,
+            throttledGetScrollPosition = null;
+
+        return {
+
+            scrollPosition: 0,
+
+            init: function (opts) {
+
+                options = extend(defaults, opts);
+
+                if (options.steps === null) {
+                    console.warn('Smooth scrolling require some sections or steps to scroll to :)');
+                    return false;
+                }
+
+                // Allow to customize the animation engine ( jQuery / GSAP / velocity / ... )
+                _animation = function (target) {
+                    target = typeof target === 'number' ? target : $(target).offset().top;
+                    return options.smoothScrollAnimation(target);
+                };
+
+                // Activate smooth scrolling
+                if (options.smoothScrollEnabled)  this.smoothScroll();
+
+                // Scroll to top handling
+                if (options.scrollToTopBtn) {
+                    options.scrollToTopBtn.addEventListener('click', function () {
+                        options.smoothScrollAnimation(0);
+                    });
+                }
+
+                // Throttle for performances gain
+                throttledGetScrollPosition = throttle(this.getScrollPosition).bind(this);
+                window.addEventListener('scroll', throttledGetScrollPosition);
+                window.addEventListener('resize', throttledGetScrollPosition);
+
+                this.getScrollPosition();
+            },
+
+            getScrollPosition: function () {
+                this.scrollPosition = window.pageYOffset || window.scrollY;
+                if (options.stepsCheckEnabled) this.checkActiveStep();
+                if (typeof  options.onScroll === 'function') options.onScroll(this.scrollPosition);
+            },
+
+            scrollPercentage: function () {
+                var body = document.body,
+                    html = document.documentElement,
+                    documentHeight = Math.max(body.scrollHeight, body.offsetHeight,
+                        html.clientHeight, html.scrollHeight, html.offsetHeight);
+
+                var percentage = Math.round(this.scrollPosition / (documentHeight - window.innerHeight) * 100);
+                if (percentage < 0)  percentage = 0;
+                if (percentage > 100)  percentage = 100;
+                return percentage;
+            },
+
+            doSmoothScroll: function (e) {
+                if (e.target.nodeName === 'A') {
+                    e.preventDefault();
+                    if (location.pathname.replace(/^\//, '') === e.target.pathname.replace(/^\//, '') && location.hostname === e.target.hostname) {
+                        var targetStep = document.querySelector(e.target.hash);
+                        targetStep ? _animation(targetStep) : console.warn('Hi! You should give an animation callback function to the Scroller module! :)');
+                    }
+                }
+            },
+
+            smoothScroll: function () {
+                if (options.navigationContainer !== null) options.navigationContainer.addEventListener('click', this.doSmoothScroll);
+            },
+
+            checkActiveStep: function () {
+                var scrollPosition = this.scrollPosition;
+
+                [].forEach.call(options.steps, function (step) {
+                    var bBox = step.getBoundingClientRect(),
+                        position = step.offsetTop,
+                        height = position + bBox.height;
+
+                    if (scrollPosition >= position && scrollPosition < height && currentStep !== step) {
+                        currentStep = step;
+                        step.classList.add(self.currentStepClass);
+                        if (typeof options.onStepChange === 'function') options.onStepChange(step);
+                    }
+                    step.classList.remove(options.currentStepClass);
+                });
+            },
+
+            destroy: function () {
+                window.removeEventListener('scroll', throttledGetScrollPosition);
+                window.removeEventListener('resize', throttledGetScrollPosition);
+                options.navigationContainer.removeEventListener('click', this.doSmoothScroll);
+            }
+        }
+    })();
+     //////////////////////
+     // END scroll Module
+     //////////////////////
+  
+  
+    //////////////////////
+    // APP init
+    //////////////////////
+
+    var scrollToTopBtn = document.querySelector('.Scroll-to-top'),
+        steps = document.querySelectorAll('.js-scroll-step'),
+        navigationContainer = document.querySelector('.Quick-navigation'),
+        //links = navigationContainer.querySelectorAll('a'),
+        progressIndicator = document.querySelector('.Scroll-progress-indicator');
+
+    ScrollManager.init({
+        steps: steps,
+        scrollToTopBtn: scrollToTopBtn,
+        navigationContainer: navigationContainer,
+       // links: links,
+      
+        // Customize onScroll behavior
+        onScroll: function () {
+            var percentage = ScrollManager.scrollPercentage();
+            percentage >= 90 ? scrollToTopBtn.classList.add('visible') : scrollToTopBtn.classList.remove('visible');
+        },
+    });
+  
+    //////////////////////
+    // END APP init
+    //////////////////////
+
+})();
+
+document.onreadystatechange = function() { 
+            if (document.readyState !== "complete") { 
+                document.querySelector( 
+                  "body").style.visibility = "hidden"; 
+                document.querySelector( 
+                  "#loader").style.visibility = "visible"; 
+            } else { 
+                document.querySelector( 
+                  "#loader").style.display = "none"; 
+                document.querySelector( 
+                  "body").style.visibility = "visible"; 
+            } 
+        }; 
+</script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- style.css-->
+    <link href="css/style.css" rel="stylesheet">
+     <link href="css/aos.css" rel="stylesheet">
+     <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+  </head>
+  <body>
+    <div id="loader" class="center"></div> 
+    <nav class="navbar navbar-expand-md navbar-light fixed-top bg-light">
+     <a class="navbar-brand" href="#"><img src="images/logo.png"/></a>
+        <input type="checkbox" id="menu-button" class="menu-input navbar-toggle " data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" />
+        <label class="menu-button" for="menu-button">
+            <span></span>
+        </label>
+       <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav mr-auto smooth-scroll">
+            <li class="nav-item">
+              <a class="nav-link"  class="Quick-navigation-item" href="index.html"> Home </a>
+            </li>
+            <li class="nav-item ">
+              <a class="nav-link"  class="Quick-navigation-item" href="portfolio.html">Portfolio </a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link"  class="Quick-navigation-item" href="contact.html"> Contact Us <span class="sr-only">(current)</span></a>
+              </li>
+              <li class="nav-item">
+              <a class="nav-link"  class="Quick-navigation-item" href="CV.html"> CV</a>
+            </li>
+          </ul>
+        </div>
+    </nav>
+     <section id="get-in-touch">
+       <div class="portfolio-overly h-100">
+         <div class="container h-100">
+          <div class="row h-100 align-items-center">
+          <div class="col-12 text-center">
+            <h1 class="font-weight-dark">Contact Us</h1>
+          </div>
+        </div>
+         </div>
+         </div>
+    </section>
+    <section id="get-in-touch-form">
+        <div class="container h-100">
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="about-us">
+                 <h1 class="text-center" >Get In Touch</h1>
+              </div>
+        <form class="contcat-form">
+              <div class="form-row">
+                <div class="col-md-6 mb-3">
+                  <label for="getintochform1">First name</label>
+                  <input type="text" class="form-control" placeholder="First name" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="getintochform2">Last name</label>
+                  <input type="text" class="form-control" placeholder="Last name" required>
+              </div>
+          </div>
+              <div class="form-row">
+                <div class="col-md-6 mb-3">
+                  <label for="getintochform3">Email Address</label>
+                  <div class="input-group">
+                    <input type="email" class="form-control"  placeholder="Email" aria-describedby="inputGroupPrepend" required>
+    
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="getintochform4">Phone Number</label>
+                  <input type="text" class="form-control"  placeholder="Phone Number" required>
+                </div>
+            </div>
+               <div class="form-row">
+              <div class="col-lg-12 col-md-12 col-sm-14 col-xs-12 mb-3">
+                <label for="getintochform5">Message</label>
+                <textarea name="message" class="form-control" placeholder="Message" rows="3"> </textarea>
+              </div>
+             </div>
+              <button class="btn btn-primary" type="submit">Submit</button>
+            </form>
+          </div>
+          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 get-in-ctuch-info">
+            <div class="about-us">
+                 <h1 class="text-center">Contact Details</h1>
+              </div>
+              <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+              <div class="contact-email">
+                 <h6> <strong> <i class="fa fa-envelope-o" aria-hidden="true"></i> Email </strong></h6>
+                 <p>Adarshnaresh30@gmail.com</p>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+              <div class="contact-email">
+                 <h6> <strong> <i class="fa fa-mobile" aria-hidden="true"></i> PHONE </strong></h6>
+                 <p>0116 25258954</p>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+              <div class="contact-email">
+                 <h6> <strong> <i class="fa fa-address-card-o" aria-hidden="true"></i> ADDRESS </strong></h6>
+                 <p>2 Sulgrave Road<br/> Leicester <br/>LE5 3NE United Kingdom</p>
+              </div>
+            </div>
+            </div>
+          </div>
+        </div>
+    </div>
+    </section>
+    <button class="Scroll-to-top">Scroll To Top</button>
+     <footer class="footer mt-auto py-3 bg-light ">
+      <div class="container">
+        <div class="footer-icon">
+            <ul class="social-icon">
+                <li><a href="https://www.instagram.com/_______a_d_______98/"><i class="fa fa-instagram" aria-hidden="true"></i></a><li>
+                <li><a href="https://twitter.com/adarshnaresh30"><i class="fa fa-twitter-square" aria-hidden="true"></i></a><li>
+                <li><a href="linkedin.com/in/adarsh-n-928633111"><i class="fa fa-linkedin-square" aria-hidden="true"></i></a><li>
+                <li><a href="https://github.com/Adarsh981130"><i class="fa fa-github" aria-hidden="true"></i></a><li>
+              </ul>
+        </div>
+      </div>
+  </footer>
+
+    <!-- SCRIPTS -->
+    <!-- JQuery -->
+    <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+    <!-- page scrolling used-->
+    <script src="js/ScrollMagic.min.js"></script>
+    <script src="js/debug.addIndicators.min.js"></script>
+    <script type="text/javascript" src="js/aos.js"></script>
+    
+    <script>
+//animation of cars
+   AOS.init();
+
+//scrooling top
+   (function () {
+    
+   //////////////////////
+  // Utils
+  //////////////////////
+    function throttle(fn, delay, scope) {
+        // Default delay
+        delay = delay || 250;
+        var last, defer;
+        return function () {
+            var context = scope || this,
+                now = +new Date(),
+                args = arguments;
+            if (last && now < last + delay) {
+                clearTimeout(defer);
+                defer = setTimeout(function () {
+                    last = now;
+                    fn.apply(context, args);
+                }, delay);
+            } else {
+                last = now;
+                fn.apply(context, args);
+            }
+        }
+    }
+
+    function extend(destination, source) {
+        for (var k in source) {
+            if (source.hasOwnProperty(k)) {
+                destination[k] = source[k];
+            }
+        }
+        return destination;
+    }
+  
+   //////////////////////
+  // END Utils
+  //////////////////////
+  
+   //////////////////////
+   // Scroll Module
+   //////////////////////
+
+    var ScrollManager = (function () {
+
+        var defaults = {
+
+                steps: null,
+                navigationContainer: null,
+                //links: null,
+                scrollToTopBtn: null,
+
+                navigationElementClass: '.Quick-navigation',
+                currentStepClass: 'current',
+                smoothScrollEnabled: true,
+                stepsCheckEnabled: true,
+
+                // Callbacks
+                onScroll: null,
+
+                // onStepChange: function (step) {
+                //     var self = this;
+                //     var relativeLink = [].filter.call(options.links, function (link) {
+                //         link.classList.remove(self.currentStepClass);
+                //         return link.hash === '#' + step.id;
+                //     });
+                //     relativeLink[0].classList.add(self.currentStepClass);
+                // },
+
+                // Provide a default scroll animation
+                smoothScrollAnimation: function (target) {
+                    $('html, body').animate({
+                        scrollTop: target
+                    }, 'slow');
+                }
+            },
+
+            options = {};
+
+        // Privates
+        var _animation = null,
+            currentStep = null,
+            throttledGetScrollPosition = null;
+
+        return {
+
+            scrollPosition: 0,
+
+            init: function (opts) {
+
+                options = extend(defaults, opts);
+
+                if (options.steps === null) {
+                    console.warn('Smooth scrolling require some sections or steps to scroll to :)');
+                    return false;
+                }
+
+                // Allow to customize the animation engine ( jQuery / GSAP / velocity / ... )
+                _animation = function (target) {
+                    target = typeof target === 'number' ? target : $(target).offset().top;
+                    return options.smoothScrollAnimation(target);
+                };
+
+                // Activate smooth scrolling
+                if (options.smoothScrollEnabled)  this.smoothScroll();
+
+                // Scroll to top handling
+                if (options.scrollToTopBtn) {
+                    options.scrollToTopBtn.addEventListener('click', function () {
+                        options.smoothScrollAnimation(0);
+                    });
+                }
+
+                // Throttle for performances gain
+                throttledGetScrollPosition = throttle(this.getScrollPosition).bind(this);
+                window.addEventListener('scroll', throttledGetScrollPosition);
+                window.addEventListener('resize', throttledGetScrollPosition);
+
+                this.getScrollPosition();
+            },
+
+            getScrollPosition: function () {
+                this.scrollPosition = window.pageYOffset || window.scrollY;
+                if (options.stepsCheckEnabled) this.checkActiveStep();
+                if (typeof  options.onScroll === 'function') options.onScroll(this.scrollPosition);
+            },
+
+            scrollPercentage: function () {
+                var body = document.body,
+                    html = document.documentElement,
+                    documentHeight = Math.max(body.scrollHeight, body.offsetHeight,
+                        html.clientHeight, html.scrollHeight, html.offsetHeight);
+
+                var percentage = Math.round(this.scrollPosition / (documentHeight - window.innerHeight) * 100);
+                if (percentage < 0)  percentage = 0;
+                if (percentage > 100)  percentage = 100;
+                return percentage;
+            },
+
+            doSmoothScroll: function (e) {
+                if (e.target.nodeName === 'A') {
+                    e.preventDefault();
+                    if (location.pathname.replace(/^\//, '') === e.target.pathname.replace(/^\//, '') && location.hostname === e.target.hostname) {
+                        var targetStep = document.querySelector(e.target.hash);
+                        targetStep ? _animation(targetStep) : console.warn('Hi! You should give an animation callback function to the Scroller module! :)');
+                    }
+                }
+            },
+
+            smoothScroll: function () {
+                if (options.navigationContainer !== null) options.navigationContainer.addEventListener('click', this.doSmoothScroll);
+            },
+
+            checkActiveStep: function () {
+                var scrollPosition = this.scrollPosition;
+
+                [].forEach.call(options.steps, function (step) {
+                    var bBox = step.getBoundingClientRect(),
+                        position = step.offsetTop,
+                        height = position + bBox.height;
+
+                    if (scrollPosition >= position && scrollPosition < height && currentStep !== step) {
+                        currentStep = step;
+                        step.classList.add(self.currentStepClass);
+                        if (typeof options.onStepChange === 'function') options.onStepChange(step);
+                    }
+                    step.classList.remove(options.currentStepClass);
+                });
+            },
+
+            destroy: function () {
+                window.removeEventListener('scroll', throttledGetScrollPosition);
+                window.removeEventListener('resize', throttledGetScrollPosition);
+                options.navigationContainer.removeEventListener('click', this.doSmoothScroll);
+            }
+        }
+    })();
+     //////////////////////
+     // END scroll Module
+     //////////////////////
+  
+  
+    //////////////////////
+    // APP init
+    //////////////////////
+
+    var scrollToTopBtn = document.querySelector('.Scroll-to-top'),
+        steps = document.querySelectorAll('.js-scroll-step'),
+        navigationContainer = document.querySelector('.Quick-navigation'),
+        //links = navigationContainer.querySelectorAll('a'),
+        progressIndicator = document.querySelector('.Scroll-progress-indicator');
+
+    ScrollManager.init({
+        steps: steps,
+        scrollToTopBtn: scrollToTopBtn,
+        navigationContainer: navigationContainer,
+       // links: links,
+      
+        // Customize onScroll behavior
+        onScroll: function () {
+            var percentage = ScrollManager.scrollPercentage();
+            percentage >= 90 ? scrollToTopBtn.classList.add('visible') : scrollToTopBtn.classList.remove('visible');
+        },
+    });
+  
+    //////////////////////
+    // END APP init
+    //////////////////////
+
+})();
+
+document.onreadystatechange = function() { 
+            if (document.readyState !== "complete") { 
+                document.querySelector( 
+                  "body").style.visibility = "hidden"; 
+                document.querySelector( 
+                  "#loader").style.visibility = "visible"; 
+            } else { 
+                document.querySelector( 
+                  "#loader").style.display = "none"; 
+                document.querySelector( 
+                  "body").style.visibility = "visible"; 
+            } 
+        }; 
+</script>
+<!-- contact form https://getbootstrap.com/docs/4.0/components/forms/>
+  </body>
